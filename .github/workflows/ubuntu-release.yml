@@ -80,7 +80,6 @@ jobs:
           git config user.name "Router Protocol"
           git config user.email "infra@routerprotocol.com"
           ls -al ${{ github.workspace }}/router-chain-binaries/
-          mkdir -p linux
           mv ${{ github.workspace }}/router-chain-binaries/routerd.tar.gz ./linux/
           git add linux/routerd.tar.gz
           git commit -m "Latest router-chain executable updated: $(date +'%Y-%m-%d %H:%M:%S')"
