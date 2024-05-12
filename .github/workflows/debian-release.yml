@@ -71,7 +71,7 @@ jobs:
 
       - uses: actions/checkout@v3
         with:
-          repository: "router-protocol/router-chain-binary-release"
+          repository: "router-protocol/router-chain-testnet-release"
           ref: "debian-build"
           path: "rc-releases"
           token: ${{ secrets.USER_GITHUB_TOKEN }}
