@@ -1,0 +1,90 @@
+name: Router-chain-debian-build
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Tag binary version"
+        required: true
+
+jobs:
+  setup:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "1.20"
+
+  build-router-chain:
+    needs: setup
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: "router-protocol/router-chain"
+          ref: "testnet"
+          path: "router-chain"
+          token: ${{ secrets.USER_GITHUB_TOKEN }}
+
+      - name: Build router-chain
+        run: |
+          echo "🛠️ Building router-chain binary"
+          cd router-chain
+          go mod download
+          WASMVM_VERSION=$(go list -m github.com/CosmWasm/wasmvm | cut -d ' ' -f 2) && \
+          wget https://github.com/CosmWasm/wasmvm/releases/download/$WASMVM_VERSION/libwasmvm_muslc.$(uname -m).a -O /lib/libwasmvm_muslc.a && \
+          wget https://github.com/CosmWasm/wasmvm/releases/download/$WASMVM_VERSION/checksums.txt -O /tmp/checksums.txt && \
+          sha256sum /lib/libwasmvm_muslc.a | grep $(cat /tmp/checksums.txt | grep $(uname -m) | cut -d ' ' -f 1)
+          git config --global user.name "Router Protocol"
+          git config --global user.email "infra@routerprotocol.com"
+          git tag ${{ github.event.inputs.version }}
+          go mod tidy
+          make build
+          echo "routerd build successful"
+          cd ./bin
+          echo "pwd: $(pwd)"
+          ls -al
+          tar -czvf routerd.tar.gz routerd
+          mkdir -p ${{ github.workspace }}/router-chain-binaries/
+          mv routerd.tar.gz ${{ github.workspace }}/router-chain-binaries/
+          echo "🔥 routerd.tar.gz created"
+          echo "🔥 routerd.tar.gz moved to ${{ github.workspace }}/router-chain-binaries/"
+          cd ${{ github.workspace }}/router-chain-binaries/
+          ls -al
+
+      - name: Archive router-chain binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: router-chain
+          path: ${{ github.workspace }}/router-chain-binaries/routerd.tar.gz
+
+  package-and-push:
+    needs: [build-router-chain]
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Download router-chain binary
+        uses: actions/download-artifact@v2
+        with:
+          name: router-chain
+          path: ${{ github.workspace }}/router-chain-binaries/
+
+      - uses: actions/checkout@v3
+        with:
+          repository: "router-protocol/router-chain-binary-release"
+          ref: "debian-build"
+          path: "rc-releases"
+          token: ${{ secrets.USER_GITHUB_TOKEN }}
+
+      - name: Package and Push new binaries to the current repository
+        run: |
+          cd rc-releases
+          git config --global url."https://ganesh_bhagi:${{secrets.USER_GITHUB_TOKEN}}@github.com/".insteadOf "https://github.com/"
+          git config user.name "Router Protocol"
+          git config user.email "infra@routerprotocol.com"
+          ls -al ${{ github.workspace }}/router-chain-binaries/
+          mkdir -p debian
+          mv ${{ github.workspace }}/router-chain-binaries/routerd.tar.gz ./debian/
+          git add debian/routerd.tar.gz
+          git commit -m "Latest router-chain executable updated: $(date +'%Y-%m-%d %H:%M:%S')"
+          git push
