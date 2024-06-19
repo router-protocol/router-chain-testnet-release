@@ -27,16 +27,22 @@ jobs:
           path: "router-chain"
           token: ${{ secrets.USER_GITHUB_TOKEN }}
 
+      - name: Set up CGO
+        run: |
+          echo "CGO_ENABLED=1" >> $GITHUB_ENV
+          echo "CGO_CFLAGS=-O2 -g -Wall" >> $GITHUB_ENV
+          echo "CGO_LDFLAGS=-O2 -g" >> $GITHUB_ENV
+
       - name: Build router-chain
         run: |
           echo "🛠️ Building router-chain binary"
-          echo $(uname -m)
+          echo "uname: $(uname -m)"
+          echo "GO version: $(go version)"
+          echo "Environment variables:"
+          env
+
           cd router-chain
           go mod download
-          WASMVM_VERSION=$(go list -m github.com/CosmWasm/wasmvm | cut -d ' ' -f 2) && \
-          wget https://github.com/CosmWasm/wasmvm/releases/download/$WASMVM_VERSION/libwasmvm_muslc.$(uname -m).a -O /lib/libwasmvm_muslc.a && \
-          wget https://github.com/CosmWasm/wasmvm/releases/download/$WASMVM_VERSION/checksums.txt -O /tmp/checksums.txt && \
-          sha256sum /lib/libwasmvm_muslc.a | grep $(cat /tmp/checksums.txt | grep $(uname -m) | cut -d ' ' -f 1)
           git config --global user.name "Router Protocol"
           git config --global user.email "infra@routerprotocol.com"
           git tag ${{ github.event.inputs.version }}
@@ -44,7 +50,7 @@ jobs:
           make build
           echo "routerd build successful"
           cd ./bin
-          tar -czvf   .tar.gz routerd
+          tar -czvf routerd.tar.gz routerd
           mkdir -p ${{ github.workspace }}/router-chain-binaries/
           mv routerd.tar.gz ${{ github.workspace }}/router-chain-binaries/
           echo "🔥 routerd.tar.gz created"
