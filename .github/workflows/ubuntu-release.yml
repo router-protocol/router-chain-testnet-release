@@ -30,6 +30,7 @@ jobs:
       - name: Build router-chain
         run: |
           echo "🛠️ Building router-chain binary"
+          echo $(uname -m)
           cd router-chain
           go mod download
           WASMVM_VERSION=$(go list -m github.com/CosmWasm/wasmvm | cut -d ' ' -f 2) && \
@@ -43,7 +44,7 @@ jobs:
           make build
           echo "routerd build successful"
           cd ./bin
-          tar -czvf routerd.tar.gz routerd
+          tar -czvf   .tar.gz routerd
           mkdir -p ${{ github.workspace }}/router-chain-binaries/
           mv routerd.tar.gz ${{ github.workspace }}/router-chain-binaries/
           echo "🔥 routerd.tar.gz created"
