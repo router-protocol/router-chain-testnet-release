@@ -1,5 +1,5 @@
 # Build Runner
-FROM --platform=linux/amd64 ubuntu:22.04
+FROM --platform=linux/x86_64 ubuntu:22.04
 
 # Install necessary packages
 RUN apt-get update && apt-get upgrade -y && apt-get install -y git wget

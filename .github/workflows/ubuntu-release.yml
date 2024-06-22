@@ -27,19 +27,11 @@ jobs:
           path: "router-chain"
           token: ${{ secrets.USER_GITHUB_TOKEN }}
 
-      - name: Set up CGO
-        run: |
-          echo "CGO_ENABLED=1" >> $GITHUB_ENV
-          echo "CGO_CFLAGS=-O2 -g -Wall" >> $GITHUB_ENV
-          echo "CGO_LDFLAGS=-O2 -g" >> $GITHUB_ENV
-
       - name: Build router-chain
         run: |
           echo "🛠️ Building router-chain binary"
-          echo "uname: $(uname -m)"
+          echo "uname: $(uname -m)" #x86_64
           echo "GO version: $(go version)"
-          echo "Environment variables:"
-          env
 
           cd router-chain
           go mod download
@@ -50,7 +42,7 @@ jobs:
           make build
           echo "routerd build successful"
           cd ./bin
-          tar -czvf routerd.tar.gz routerd
+          tar -czvf   .tar.gz routerd
           mkdir -p ${{ github.workspace }}/router-chain-binaries/
           mv routerd.tar.gz ${{ github.workspace }}/router-chain-binaries/
           echo "🔥 routerd.tar.gz created"
