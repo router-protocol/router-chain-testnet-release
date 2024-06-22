@@ -42,7 +42,8 @@ jobs:
           make build
           echo "routerd build successful"
           cd ./bin
-          tar -czvf   .tar.gz routerd
+          tar -czvf .tar.gz routerd
+          ls -al
           mkdir -p ${{ github.workspace }}/router-chain-binaries/
           mv routerd.tar.gz ${{ github.workspace }}/router-chain-binaries/
           echo "🔥 routerd.tar.gz created"
