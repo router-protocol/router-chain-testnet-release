@@ -5,7 +5,7 @@ FROM --platform=linux/x86_64 ubuntu:22.04
 RUN apt-get update && apt-get upgrade -y && apt-get install -y git wget
 COPY ./linux/routerd.tar.gz .
 
-RUN wget https://raw.githubusercontent.com/router-protocol/routerd-libs/main/libwasmvm.x86_64.so
+RUN wget https://github.com/CosmWasm/wasmvm/releases/download/v1.5.2/libwasmvm.x86_64.so
 RUN cp libwasmvm.x86_64.so /lib
 RUN cp libwasmvm.x86_64.so /lib64
 
