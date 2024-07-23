@@ -1,0 +1,21 @@
+version: '3.3'
+services:
+  rc-node1:
+    container_name: "rc-node1"
+    build:
+      context: .
+    volumes:
+      - /Users/router/.routerd:/router/.routerd
+    ports: ["26657:26657", "26656:26656", "1317:1317", "9090:9090", "9091:9091"]
+    entrypoint: ["routerd", "--rpc.laddr", "tcp://0.0.0.0:26657", "start"]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - router-chain-network
+
+volumes:
+  router-chain-vol:
+    external: false
+networks:
+  router-chain-network:
+    external: false
