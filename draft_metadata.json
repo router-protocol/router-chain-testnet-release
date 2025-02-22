@@ -1,0 +1,8 @@
+{
+ "title": "Poll to take some action XYZ",
+ "authors": "Router Foundation",
+ "summary": "with this action Router will focusing on some dev effort",
+ "details": "details",
+ "proposal_forum_url": "https://www.google.com",
+ "vote_option_context": "Yes-Context"
+}
