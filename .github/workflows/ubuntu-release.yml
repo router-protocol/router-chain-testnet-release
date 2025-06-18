@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: "router-protocol/router-chain"
-          ref: "testnet-v2"
+          ref: "feat/reduce-orch-power"
           path: "router-chain"
           token: ${{ secrets.USER_GITHUB_TOKEN }}
 
