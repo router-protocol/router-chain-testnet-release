@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: "router-protocol/router-chain"
-          ref: "feat/reduce-orch-power"
+          ref: "hotfix/outbound-validation"
           path: "router-chain"
           token: ${{ secrets.USER_GITHUB_TOKEN }}
 
